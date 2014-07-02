@@ -1,0 +1,304 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage[includefoot,nomarginpar,twoside,
+    top=25mm,bottom=18mm,
+    head=5mm,headsep=7mm,
+    footskip=8mm,
+    hmargin=22mm,bindingoffset=10mm]{geometry}
+    
+\usepackage[frenchb]{babel}
+
+ % police
+\usepackage[T1]{fontenc}
+%\usepackage{mathptmx}
+\usepackage{times}
+
+\usepackage{textcomp}
+
+\usepackage[it,font=it,center]{caption}
+\usepackage[sort]{natbib}
+
+\usepackage[unicode, pdftex,hyperfootnotes=false,pdfpagelabels,
+pdftitle={Rapport d'avancement 2014 - PostDoc Eloi Grau}, 
+pdfauthor={Grau Eloi}, 
+colorlinks=true,
+citecolor=black,
+linkcolor=black,
+ pdfhighlight =/O,
+bookmarksnumbered=true,
+bookmarksopen=true,
+pagebackref=false]{hyperref}
+
+\usepackage{titlesec}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage{subfigure} 
+\usepackage{verbatim}
+\usepackage{listings} % pour insertion code python
+
+%\usepackage{wrapfig} % images a cote du texte
+\usepackage{picins} % images a cote du texte
+
+\usepackage{chngpage}
+
+\usepackage[final]{pdfpages} % inclure des pdf
+\usepackage{fancyvrb} % pout utiliser Verbatim
+
+\def\us{\char`\_}
+\graphicspath{{./images/}}
+
+\newcommand{\ie}{\textit{i.e.}~}
+\newcommand{\cf}{\textit{cf.}~}
+%\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\figurename}{\small \bf Fig.}
+\renewcommand{\tablename}{\small \bf Tab.}
+\newcommand{\eg}{\textit{e.g.}~}
+
+\begin{document}
+
+\begin{center}
+ \Large Rapport d'avancement du Post-Doctorat :\\[1cm]
+ \LARGE \textbf{Simulations de mesures Lidar satellite pour la caractérisation de canopées de forêts tempérées et tropicales. Optimisation des méthodes de simulation et étude de sensibilité du signal.}\\[1cm]
+ 
+ \text{Eloi Grau}\\[1cm]
+ CNES - IRSTEA \\[1cm]
+ 
+\large Unité  de Recherche  : TETIS\\[0.5cm]
+%Thème de Recherche : Synergie\\[0.8cm]
+ \today
+\end{center}
+
+\vspace{1.5cm}
+
+\renewcommand{\contentsname}{}
+\tableofcontents
+
+\clearpage
+
+
+Ce post-doctorat a démarré en septembre 2013 pour une durée d'un an, reconductible une fois. Il s'inscrit dans le cadre du projet Steam-Leaf proposé au TOSCA CNES. L'objectif du projet est de  développer des outils et des méthodes destinés à évaluer l'impact de certains paramètres d'un système lidar spatial sur la qualité de caractérisation des milieux forestiers. En particulier, il apparaît important de développer une expertise sur les nouveaux capteurs full-waveform, afin de mieux comprendre les relations entre signal et caractéristiques de la végétation, et développer des méthodes de prédiction de ces caractéristiques et de validation des résultats.
+
+
+\section{Introduction}
+Les forêts  constituent un élément majeur au cycle du carbone et contribuent de façon significative à la régulation du climat. Elles sont aussi une source d'énergie renouvelable (bois énergie) et, en abritant 65\% des taxons terrestres, elles jouent  un rôle clé dans le maintien de la biodiversité. Aussi, pouvoir caractériser les forêts et leur dynamique est fondamental. Il est donc indispensable de développer des systèmes robustes de mesure pour estimer et caractériser la dynamique de certains paramètres clés -tels que le volume de bois et la biomasse- afin de pouvoir relever le défi de la gestion durable des ressources forestières et de renforcer leur rôle dans l'atténuation du changement climatique.
+
+
+
+Le Lidar est un capteur actif qui enregistre l'énergie en fonction du temps de parcours (\textit{forme d'onde}, ou "\textit{waveform}) d'une impulsion laser émise puis rétro-diffusée par les éléments du paysage. C'est une technologie qui peut potentiellement permettre de mesurer la réflectance et la structure de la forêt à différentes échelles. Dans ce contexte, le lidar spatial apparaît comme une technologie particulièrement prometteuse pour fournir une partie des informations requises et combler le manque en données exhaustives et cohérentes sur l'ensemble des surfaces forestières de la Terre. A ce jour il n'existe aucun système Lidar spatial conçu pour l'étude de la végétation et le CNES soutien des études en vue d'évaluer l'intérêt de développer un tel système. 
+
+
+Cependant, il existe de nombreuses possibilités technologiques des instruments lidar (\eg énergie d'impulsion, taille de l'empreinte au sol, longueur d'onde), et différentes méthodes d'extraction des paramètres biophysiques (qui elles-même dépendent des choix techniques). Mais la sensibilité des mesures lidar aux paramètres instrumentaux et aux caractéristiques forestières est mal connue. Le couplage entre acquisitions de données Lidar expérimentales et relevés de terrain peut permettre d'étudier cette sensibilité mais cette approche est coûteuse et limitée à l'étude de quelques contextes forestiers. Ainsi, la simulation doit permettre de l'étudier de façon quasi exhaustive et à moindre frais. 
+
+
+Le modèle DART (Discrete Anisotropic Radiative Transfer) développé au CESBIO, permet de simuler tout type de lidar (terrestre, aéroporté ou spatial) sur des paysages où les éléments peuvent être représentés soit statistiquement par des milieux dits "turbides", soit de façon déterministe à l'aide de triangles (ou une combinaison des deux). Ce modèle est souple et robuste et permet d'effectuer des simulations précises sur un environnement connu, sous réserve que les maquettes (\ie représentation du paysage) soient précises. Un autre modèle a aussi été choisi afin d'intercomparer les résultats, et mieux estimer la précision de chacun des modèles. Il s'agit du modèle Lid'ART développé à l'UMR AMAP et intégré à la plateforme AMAPStudio. Il permet de simuler un capteur Lidar aéroporté ou satellite sur des maquettes d'arbre précises, conçues avec AMAPStudio.
+
+
+Ces modèles simulent le transfert radiatif de façon précise, sur la base des lois physiques du rayonnement. Ils comportent cependant des hypothèses et simplifications permettant de résoudre l'équation du transfert radiatif sur des scènes complexes avec des temps de calcul raisonnables. L'approche par modélisation doit donc être validée sur des cas d'étude pour lesquels on dispose des données terrain et Lidar aéroporté, avant d'étendre simulations au cas d'un lidar spatial. Il existe plusieurs types de maquettes (\ie représentations du paysage dans les modèles) plus ou moins adaptés à la simulation de tel ou tel type de capteurs de télédétection. Il faut donc aussi identifier le type de maquette adapté à la simulation de mesures à partir d'un lidar spatial. De plus, comme de nombreuses simulations doivent être effectuées, il est important que les maquettes soient optimisées (\ie la plus simple possible sans perdre les informations dans les waveform simulées). Ce travail est primordial pour la suite de l'étude.
+
+
+
+\section{Objectifs}
+Les objectifs du post-doctorat sont :
+\begin{itemize}
+\item le développement d'une plateforme de simulation qui intègre plusieurs simulateurs (LidART et DART). La plateforme doit permettre 1) de définir des entrées similaires dans les différents simulateurs et 2) d’inter-comparer les sorties des modèles.
+
+\item la création de maquettes forestières de référence. Ces maquettes doivent couvrir une gamme de types de peuplement (en terme de hauteur et de densité de végétation) et décrire le plus fidèlement possible la réalité.
+
+\item la création de maquettes "simplifiées", afin d'étudier la sensibilité du lidar à la description de la scène, et ainsi connaître le degré de complexité minimum nécessaire et suffisant pour les mesures terrain et la simulation de données lidar full-waveform.
+
+\item la génération d'un banc de simulations permettant d'analyser l'impact de certains paramètres du milieu et du système sur la qualité des informations forestières extraites (e.g. hauteurs, biomasse, LAI)
+
+\end{itemize}
+
+
+\section{Matériel et méthode}
+
+\subsection{Données terrain}
+Les données terrain  vont servir d'une part à créer les scènes forestières de référence et d'autre part à valider les simulations de mesure Lidar. Plusieurs campagnes de mesures ont permis d'obtenir des données (relevés terrain, mesures lidar aéroportées - ALS pour \textit{Airborne Laser Scanning} - et lidar terrestre - TLS pour \textit{Terrestrial Laser Scanning})  sur 4 sites d'étude : les Landes, Bures (Vosges), Guyane (Paracou), La Réunion (voir tableau \ref{tab:sites}). Chaque site comporte différentes placettes qui ont été choisies pour couvrir une large gamme de caractéristiques de peuplement (densité, hauteur, âge).  
+
+\begin{table}[htpb!]
+\caption {Sites d'étude, nombre de placettes et mesures utilisées durant le post-doctorat}
+\label{tab:sites}
+\centering
+\begin{tabular}{c|c|c|c|c|c}
+%\hline 
+Site & Placettes & Projet & mesures ALS & TLS & terrain\\ 
+\hline 
+Landes & 7 & Foresee & • & • & •\\ 
+%\hline 
+Bures & 4 & Foresee + ONF & • & • & $\times$\\ 
+%\hline 
+Guyane & 2 & CANOPOR & • & • & $\times$\\ 
+%\hline 
+La Réunion & 4 & Stem-Leaf + DELICE & en attente & • & • \\ 
+%\hline 
+\end{tabular} 
+\end{table} 
+
+
+\begin{figure}[!htpb]
+\centering
+\subfigure{\includegraphics[width=0.49\textwidth]{140521_075424_Image001}}
+\subfigure{\includegraphics[width=0.49\textwidth]{MareLongueMNTarbres}}
+\caption{Photographie (à gauche); MNT, position et dbH des arbres mesurés (à droite) sur une placette de La Réunion. Les coordonnées sont données dans le référentiel lié à la placette. }
+\label{fig:relevesReunion}
+\end{figure}
+
+\subsection{ Matériel et Méthode}
+\subsubsection{Création des maquettes}
+Dans un premier temps, les données permettent de créer les scènes de référence. Plusieurs méthodes sont utilisées et serviront à la comparaison :
+\begin{description}
+\setlength{\itemsep}{0.1cm}%
+%\setlength{\parskip}{0cm}%
+\item [Maquettes créées à partir des relevés traditionnels]\hfill \\ 
+les relevés terrain ont pour principales mesures la position, la hauteur, et le diamètre à hauteur de poitrine (dbh) des arbres pour $dbh > 0.07~m$. Ces mesures permettent de créer des maquettes d'arbre simples au format DART, où les arbres sont représentés avec leur tronc sous forme de triangles et leur houppier sous forme de voxels turbides juxtaposés prenant des formes prédéfinies (\eg ellipsoïde, cône). Dans les houppiers, les distributions des feuilles et des trouées peuvent être paramétrés. Cependant, il est difficile en pratique de connaître la bonne paramétrisation pour chaque espèce et les mesures terrain ne les indiquent pas. Ainsi les houppiers sont approximés d'après les données bibliograhiques disponibles ou simplement homogènes. Ce type de représentation est relativement simple et permet d'effectuer des analyses de sensibilité.
+
+\begin{figure}[!htpb]
+\centering
+\subfigure{\includegraphics[width=0.35\textwidth]{DARTLandes}}
+\caption{Représentation 3D d'une maquette DART d'une parcelle des landes, décrite d'après les relevés terrain}
+\label{fig:maquetteDART}
+\end{figure}
+
+\item [Maquettes AMAP]\hfill \\ 
+l'UMR AMAP (botAnique et bio-inforMatique de l'Architecture des Plantes) a développé une suite logicielle qui permet de simuler la croissance des plantes sur la base d'observations et de relevés  botaniques. Cet outil permet de créer des maquettes d'arbre isolé et récemment d'arbres en peuplement de façon très précise, sous réserve d'avoir bien caractérisé l'espèce à simuler. En effet, le développement des plantes dépends de très nombreux facteurs, et peu d'espèces sont bien caractérisées à ce jour (le pin des landes en fait partie, hêtre est en cours d'étude). Ainsi, il n'est pas possible à l'heure actuelle de simuler avec cette méthode un peuplement tropical qui peut contenir des centaines d'espèce. Néanmoins, un choix de placettes des Landes (et potentiellement des hêtraies de Bure) seront simulées de cette manière. 
+
+\begin{figure}[!htpb]
+\centering
+\subfigure{\includegraphics[width=0.35\textwidth]{AMAP10ans}}
+\caption{Représentation 3D d'une maquette AMAP d'une parcelle des Landes, peuplée de pins maritimes. La croissance des pins est simulée, ici jusqu'à 10 ans}
+\label{fig:maquetteAMAP}
+\end{figure}
+
+\item [Maquettes TLS]\hfill \\ les Lidar Terrestre "scannent" les placettes en balayant l'espace en émettant des millions d'impulsions Laser. Chaque impulsion peut donner lieu à un ou plusieurs échos situés dans l'espace, ce qui \textit{in fine} donne un nuage de points 3D. Ce nuage contient une importante quantité d'information sur l'espace scanné. Cependant, la végétation interceptant une partie des faisceaux Lidar émis, plus on s'éloigne de l'instrument plus l'information est atténuée. Nous avons donc développé un outil qui permet de créer à partir de ces mesures des maquettes sous forme de voxels 3D contenant une valeur de densité de végétation. Cet outil (outil "voxélisation") a nécessité un important investissement, et permet en outre de tester différentes approches d'estimation de la densité de végétation, d'extraire des MNT (Modèles Numériques de Terrain), de visualiser les résultats et de créer directement des maquettes au format DART. Sa validation théorique fait l'objet d'une publication en cours d'écriture.
+
+\begin{figure}[!htpb]
+\centering
+\subfigure[Nuage de points TLS]{\includegraphics[width=0.49\textwidth]{landesPla14-points}}
+\subfigure[Maquette : nuage voxélisé]{\includegraphics[width=0.49\textwidth]{landesPla14-voxels}}
+\caption{Vue 3D des points extraits (à gauche) et des maquettes TLS sous forme de voxels (résolution = 0.5 m) calculés à partir des points TLS sur une placette des Landes}
+\label{fig:voxels}
+\end{figure}
+\end{description}
+
+\subsubsection{Simulation des waveforms}
+La plateforme de simulation utilise les maquettes créées et les paramètres des vols ALS qui ont été faits sur ces placettes pour simuler les données full-waveform avec DART et LidART.  Ainsi, on pourra comparer les sorties des deux modèles entre eux, mais aussi avec les données réelles. Les waveforms simulées sont caractérisées par différents indicateurs, obtenus par l'analyse des formes d'onde :
+\begin{enumerate}
+\item calcul du début et de la fin de la forme d'onde (\ie premier et dernier "bin" au dessus du bruit)
+\item calcul des pics et des minima entre le début et la fin de la waveform
+\item détermination les compartiments : le compartiment "végétation" est compris entre le début de la waveform et le minimum le plus petit avant la fin de la waveform (s'il existe). Le sol est compris entre ce minimum et la fin de la waveform. 
+\item détermination des facteurs $RH_{25}$, $RH_{50}$ , $RH_{75}$ (pour \textit{Relative Height}): ils correspondent à la distance par rapport au sol où est atteint  respectivement 25\%, 50\% et 75\% de l'énergie totale de la waveform.
+\end{enumerate}
+
+
+\begin{figure}[!htpb]
+\centering
+\includegraphics[width=0.6\textwidth]{waveform}
+\caption{Exemple de waveform  où les compartiments "sol" et "végétation" sont bien distincs. Illustration de l'extension de la waveform et des facteurs "RH"}
+\label{fig:voxels}
+\end{figure}
+Les résultats des simulations sont stockés dans une base de donnée simple (format SQL), qui contient pour chaque waveform :
+
+
+\begin{itemize}
+\item[\textbullet] La waveform
+\item[\textbullet] Les caractéristiques de la waveform
+\begin{itemize}
+\item extension de la waveform
+\item intensité et position des pics
+\item énergie des compartiments de la waveform 
+\item facteurs "RH"
+\end{itemize} 
+\item[\textbullet] La description de la waveform
+\begin{itemize}
+\item nom de la placette
+\item position de départ du tir
+\item direction du tir
+\item taille de l'empreinte
+\item source (DART, lid'ART ou données lidar aéroporté)
+\end{itemize}
+\end{itemize}
+
+
+\subsubsection{Analyse des données}
+Les résultats sont comparés statistiquement, c'est-à-dire en terme de coefficient de corrélation ($R^2$) et d'écart type ($\sigma$) entre les séries d'indicateurs extraits des formes d'onde. L'analyse des données doit permettre d'apporter des réponses à plusieurs problématiques :
+
+\begin{itemize}
+\setlength{\itemsep}{0.1cm}%
+\item[$\bullet$] Quelles sont les différences entre les modèles ?\\
+{\small$\Rightarrow$} Comparaison des modèles :  sur les maquettes "AMAP", globalement (sur toutes les placettes) 
+\item[$\bullet$] Dans quelle mesure la modélisation permet une simulation fidèle à la réalité terrain ?\\
+{\small$\Rightarrow$} Validation des simulations par comparaison avec les données réelles (modèle DART). 
+\item[$\bullet$]  Quelle représentation du paysage est la plus adaptée à la simulation du lidar ? \\
+{\small$\Rightarrow$} Comparaison des maquettes (modèle DART)
+\end{itemize}
+
+
+\subsubsection{Analyse de sensibilité}
+Dans un second temps, les maquettes pourront servir à analyser la sensibilité des mesures aux caractéristiques techniques de l'instrument, en faisant varier la taille de l'empreinte, l'énergie du faisceau, ou bien la direction de visée. Le plan précis de l'étude de sensibilité reste à établir.
+
+
+D'autre part, la diversité des placettes choisies permettra de mettre en évidence la sensibilité des mesures lidar aux caractéristiques forestières (densité de végétation, biomasse, hauteur moyenne ou hauteur dominante, pente locale).
+
+\newpage
+\section{Travaux réalisés}
+La première partie du post-doc a été consacrée à :
+\begin{itemize}
+\item La mise en place de la plateforme de simulation, et d'inter-comparaison de données (intercomparaison de modèles, analyse des waveforms). 
+\item Le développement et validation de façon théorique un outil qui permet de transformer des scans Lidar terrestre en maquette 3D de peuplement (outil "voxélisation"). Une IHM a été implémentée. Une publication est en cours d'écriture.
+\begin{figure}[!htpb]
+\centering
+\subfigure{\includegraphics[width=0.95\textwidth]{voxelisationTLS}}
+\caption{Illustration du processus de validation de l'outil "voxelisation"}
+\label{fig:voxelisation}
+\end{figure}
+\item La création des maquettes "simples" sur 4 types de peuplement (Landes, Mangrove, Maquis, Savane), et simulations lidar (DART) pour l'étude CNES/ASTRIUM d'un lidar spatial basse énergie.
+\item effectuer une mission à La Réunion afin de collecter à la fois des données terrain, des données Lidar aéroporté et Lidar terrestre sur 4 placettes tropicales de structure variables. Le principal intérêt de cette campagne de mesures est que les mesures que les mesures Lidar aéroporté ont été acquises par l'équipe de Patrick Chazette qui développe un lidar atmosphère / canopée. Ainsi, toutes les caractéristiques du capteur sont connues, ce qui n'est pas le cas des acquisitions antérieures, qui ont utilisé des Lidar du marché (Riegl), dont le fabricant se garde de divulguer toutes les caractéristiques techniques.
+\item étude préliminaire de calibration de données lidar full-waveform sur le site de Paracou (réalisée en lien avec le projet CANOPOR piloté par AMAP).
+%\begin{figure}[!htpb]
+%\centering
+%\subfigure{\includegraphics[width=0.89\textwidth]{comparaisonMNT}}
+%\caption{Comparaison des MNT obtenus avec l'outil voxelisation (scans TLS) et celui obtenu à partir des mesures de la position des arbres au tachéomètre, sur une placette de La Réunion}
+%\label{fig:comparaisonMNT}
+%\end{figure}
+\end{itemize}
+
+
+\newpage
+
+\section{Bilan et perspectives}
+Ces premiers mois ont permis de mettre en place les outils qui seront utilisés pour étudier de façon rigoureuse la sensibilité du Lidar aux caractéristiques forestières. Les données TLS/ALS/terrain ont été rassemblées et uniformisées. La création de maquettes à partir des données terrain et celles à partir de mesures TLS est opérationnelle. Les maquettes AMAP sont en cours de création et de test. L'analyse des formes d'onde a été mise en place. La plateforme de simulation est opérationnelle.
+
+\vspace{0.5cm}
+
+Les travaux en cours et futurs sont les suivants :
+\begin{itemize}
+\item extraction et la géolocalisation des données full-waveform sur les placettes choisies à l'aide de l'outil IRSTEA/IGN "Full-Analyse" (Responsable : Henri Debise), afin de procéder à la phase de validation des simulations..
+\item amélioration de la plateforme avec : l'intégration d'un module de validation par comparaison avec les données réelles et d'un module de simulation de scan TLS). Complément de la documentation.
+\item L'intercomparaison des modèles DART et LidART : les premières simulations ont soulevé quelques problèmes sur la plateforme LidART qui sont en cours de résolution.
+\item la création des maquettes AMAP sur les Landes, prévues pour septembre (responsable : Marion Jourdan (AMAP))
+\item L'analyse de sensibilité des mesures lidar aux caractéristiques techniques et forestières
+\end{itemize}
+
+\vspace{0.8cm}
+
+La création de maquettes  à partir de données TLS sera présenté lors de la conférence internationale ForestSat 2014. Et sera publiée dans une revue à comité de lecture par la suite. En outre, il est envisagé d'autres publications autour de la validation des simulations et de l'exploitation des résultats de l'analyse de sensibilité, ainsi que sur la fusion de données petite empreinte pour simuler des données large empreinte.
+
+\vspace{0.8cm}
+
+Ces travaux s'inscrivent dans le cadre de collaborations avec :
+\begin{itemize}
+\item le CNES (Josiane Costeraste) : appui financier, technique et stratégique
+\item l'UMR AMAP (Grégoire Vincent, Cécile Madelaine-Antin) : création des maquettes à partir de mesures TLS/ALS.
+\item l'UMR AMAP (Jean-François Barczi, Marion Jourdan) : création des maquettes AMAP par simulation de la croissance des pins maritimes en peuplement.
+\item l'UMR AMAP (Jean Dauzat, Francois de Coligny) : amélioration du modèle LidART et appui technique sur la plateforme AMAPStudio.
+\item l'UMR CESBIO (Jean-Philippe Gastellu-Etchegorry) : amélioration du modèle DART (simulation de mesures TLS)
+\item le LSCE/CEA (Patrick Chazette): acquisition de données aéroportées (sites de La Réunion).
+\item ASTRIUM (Jérémie lochard): étude de faisabilité d'un lidar spatial basse énergie pour l'étude de la végétation
+\item l'Université de Sherbrooke (Richard Fournier) : étude de sensibilité de la voxélisation des mesures TLS.
+\end{itemize}
+
+\end{document}
